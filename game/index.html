@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>TRENCHLIGHT — sonar salvage in the trench</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="game" width="1280" height="720"></canvas>
+
+  <!-- Tiny corner HUD: oxygen, depth, relics. Nothing big, nothing center. -->
+  <div id="hud" class="hidden">
+    <div class="hud-corner">
+      <div class="hud-line">
+        <span class="hud-tag">O₂</span>
+        <div class="oxy-bar"><div id="hud-oxygen" class="oxy-fill"></div></div>
+      </div>
+      <div id="hud-depth" class="hud-line">0 m</div>
+      <div id="hud-relics" class="hud-line">◆ 0 / 5</div>
+      <div id="hud-note" class="hud-note"></div>
+    </div>
+    <button id="btn-mute" class="mute-btn" title="Mute (M)">♪</button>
+  </div>
+
+  <!-- Touch controls: virtual joystick + ping button. Shown on touch devices only. -->
+  <div id="touch-controls" class="hidden">
+    <div id="stick"><div id="stick-knob"></div></div>
+    <button id="btn-ping" class="ping-btn">PING</button>
+  </div>
+
+  <div id="screen-start" class="screen">
+    <div class="title-block">
+      <div class="eyebrow">A SONAR SALVAGE DESCENT</div>
+      <h1>TRENCHLIGHT</h1>
+      <p class="pitch">The trench is pitch black. Your flashlight is small, your oxygen is
+      short, and something huge lives down there. Ping the sonar to see —
+      but every ping calls the Warden closer. Bring back 5 relics alive.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-icon">🔦</div><h3>AIM THE LIGHT</h3><p>Move the mouse. The beam is the only thing the dark respects.</p></div>
+      <div class="card"><div class="card-icon">📡</div><h3>PING TO SEE</h3><p>SPACE fires a sonar ring that reveals the trench — and wakes the Warden.</p></div>
+      <div class="card"><div class="card-icon">🫧</div><h3>BREATHE</h3><p>Oxygen drains faster the deeper you go. Grab tanks. Get back up.</p></div>
+      <div class="card"><div class="card-icon">💎</div><h3>SALVAGE 5 RELICS</h3><p>Deeper relics are worth more. Surface with 5 to win.</p></div>
+    </div>
+    <button id="btn-play" class="big-button">▶ &nbsp;DIVE IN</button>
+    <div class="best-line">BEST SCORE <span id="best-score">0</span> &nbsp;·&nbsp; BEST DEPTH <span id="best-depth">0 m</span></div>
+    <div class="controls-line">WASD / arrows — swim &nbsp;·&nbsp; Mouse — aim light &nbsp;·&nbsp; SPACE — sonar ping &nbsp;·&nbsp; SHIFT — dash &nbsp;·&nbsp; P — pause &nbsp;·&nbsp; M — mute</div>
+  </div>
+
+  <!-- Small quiet end cards: no full-screen panel, no giant text. -->
+  <div id="card-win" class="mini-card hidden">
+    <div class="mini-title win">Surfaced alive.</div>
+    <div class="mini-sub">Five relics, one working flashlight.</div>
+    <div id="win-stats" class="mini-stats"></div>
+    <div class="mini-buttons">
+      <button id="btn-again-win" class="mini-button">↻ Play Again</button>
+      <button id="btn-menu-win" class="mini-ghost">Main Menu</button>
+    </div>
+  </div>
+
+  <div id="card-lose" class="mini-card hidden">
+    <div class="mini-title lose">Lost in the dark.</div>
+    <div id="lose-cause" class="mini-sub">Your oxygen ran out.</div>
+    <div id="lose-stats" class="mini-stats"></div>
+    <div class="mini-buttons">
+      <button id="btn-again-lose" class="mini-button">↻ Play Again</button>
+      <button id="btn-menu-lose" class="mini-ghost">Main Menu</button>
+    </div>
+  </div>
+
+  <div id="card-pause" class="mini-card hidden">
+    <div class="mini-title">Paused.</div>
+    <div class="mini-sub">The trench waits. The Warden does not.</div>
+    <div class="mini-buttons">
+      <button id="btn-resume" class="mini-button">▶ Resume</button>
+      <button id="btn-menu-pause" class="mini-ghost">Main Menu</button>
+    </div>
+  </div>
+</div>
+<script src="audio.js"></script>
+<script src="world.js"></script>
+<script src="warden.js"></script>
+<script src="render.js"></script>
+<script src="input.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
