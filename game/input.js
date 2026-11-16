@@ -70,6 +70,7 @@
     var pingBtn = document.getElementById('btn-ping');
     var stickId = null;
     var stickCenter = { x: 0, y: 0 };
+    var stickScale = 1; // rendered stick width / layout width (stage CSS scale)
 
     function markTouch() {
       if (!input.usingTouch) {
@@ -85,6 +86,10 @@
       var rect = stick.getBoundingClientRect();
       stickCenter.x = rect.left + rect.width / 2;
       stickCenter.y = rect.top + rect.height / 2;
+      // The stick is inside the scaled #stage, so its on-screen size is
+      // layout size x stage scale; touch deltas arrive in screen pixels
+      // and must be divided by the same scale to stay in game pixels.
+      stickScale = rect.width / 112 || 1;
       stickMove(e);
       e.preventDefault();
     }
@@ -94,8 +99,8 @@
       for (var i = 0; i < e.changedTouches.length; i++) {
         var t = e.changedTouches[i];
         if (t.identifier !== stickId) continue;
-        var dx = (t.clientX - stickCenter.x) / 44;
-        var dy = (t.clientY - stickCenter.y) / 44;
+        var dx = (t.clientX - stickCenter.x) / (44 * stickScale);
+        var dy = (t.clientY - stickCenter.y) / (44 * stickScale);
         var len = Math.sqrt(dx * dx + dy * dy);
         if (len > 1) { dx /= len; dy /= len; }
         input.joyX = dx;
