@@ -5,11 +5,11 @@
 (function (global) {
   'use strict';
 
-  var BODY_LEN = 150; // snout to tail, px
-  var BODY_H = 88;
-  var CATCH_R = 46;
-  var PATROL_SPEED = 42;
-  var HUNT_BASE = 70;
+  var BODY_LEN = 380; // snout to tail, px — big enough to fill the frame
+  var BODY_H = 220;
+  var CATCH_R = 110;
+  var PATROL_SPEED = 65;
+  var HUNT_BASE = 110;
 
   function createWarden(den) {
     return {
@@ -82,7 +82,7 @@
 
     w.x += Math.cos(w.angle) * speed * dt;
     w.y += Math.sin(w.angle) * speed * dt * 0.8;
-    w.x = clamp(w.x, 90, 1280 - 90);
+    w.x = clamp(w.x, 200, 1280 - 200);
     w.y = clamp(w.y, 1300, 7050);
   }
 
@@ -94,7 +94,7 @@
   function lurePos(w) {
     var a = w.angle;
     var lx = w.x + Math.cos(a) * (BODY_LEN * 0.62);
-    var ly = w.y + Math.sin(a) * (BODY_LEN * 0.62) - 34 + Math.sin(w.lurePhase) * 6;
+    var ly = w.y + Math.sin(a) * (BODY_LEN * 0.62) - BODY_H * 0.15 + Math.sin(w.lurePhase) * 6;
     return { x: lx, y: ly };
   }
 
@@ -110,18 +110,18 @@
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     // Lure glow.
-    var lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 60);
+    var lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, BODY_LEN * 0.4);
     lg.addColorStop(0, 'rgba(255, 224, 138, 0.9)');
     lg.addColorStop(0.35, 'rgba(255, 190, 80, 0.35)');
     lg.addColorStop(1, 'rgba(255, 190, 80, 0)');
     ctx.fillStyle = lg;
-    ctx.beginPath(); ctx.arc(lx, ly, 60, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(lx, ly, BODY_LEN * 0.4, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ffe9ad';
-    ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(lx, ly, BODY_LEN * 0.03, 0, Math.PI * 2); ctx.fill();
     // Two eyes.
-    var ex = sx + dir * 42, ey = sy - 16;
-    var ex2 = sx + dir * 26, ey2 = sy - 30;
-    [[ex, ey, 7], [ex2, ey2, 5]].forEach(function (e) {
+    var ex = sx + dir * BODY_LEN * 0.28, ey = sy - BODY_H * 0.18;
+    var ex2 = sx + dir * BODY_LEN * 0.17, ey2 = sy - BODY_H * 0.34;
+    [[ex, ey, BODY_LEN * 0.047], [ex2, ey2, BODY_LEN * 0.033]].forEach(function (e) {
       var g = ctx.createRadialGradient(e[0], e[1], 0, e[0], e[1], e[2] * 4);
       g.addColorStop(0, 'rgba(191, 246, 255, ' + (0.95 * pulse) + ')');
       g.addColorStop(0.4, 'rgba(120, 220, 255, ' + (0.4 * pulse) + ')');
@@ -209,20 +209,22 @@
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#e8f6ff';
     var teeth;
+    var toothStep = BODY_LEN * 0.06;
+    var toothH = BODY_LEN * 0.08;
     for (teeth = 0; teeth < 6; teeth++) { // upper teeth, pointing down
-      var tx = BODY_LEN * 0.48 - teeth * 9;
+      var tx = BODY_LEN * 0.48 - teeth * toothStep;
       ctx.beginPath();
       ctx.moveTo(tx, 0);
-      ctx.lineTo(tx - 4, 15);
-      ctx.lineTo(tx + 4, 1);
+      ctx.lineTo(tx - toothStep * 0.45, toothH);
+      ctx.lineTo(tx + toothStep * 0.45, 1);
       ctx.closePath(); ctx.fill();
     }
     for (teeth = 0; teeth < 5; teeth++) { // lower teeth, pointing up
-      var lx2 = BODY_LEN * 0.47 - teeth * 10;
+      var lx2 = BODY_LEN * 0.47 - teeth * toothStep * 1.1;
       ctx.beginPath();
-      ctx.moveTo(lx2, 15);
-      ctx.lineTo(lx2 - 4, 3);
-      ctx.lineTo(lx2 + 4, 14);
+      ctx.moveTo(lx2, toothH);
+      ctx.lineTo(lx2 - toothStep * 0.45, 3);
+      ctx.lineTo(lx2 + toothStep * 0.45, toothH - 1);
       ctx.closePath(); ctx.fill();
     }
 
@@ -239,24 +241,24 @@
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(BODY_LEN * 0.36, -BODY_H * 0.4);
-    ctx.quadraticCurveTo(BODY_LEN * 0.55, -BODY_H * 0.62, BODY_LEN * 0.62, -34);
+    ctx.quadraticCurveTo(BODY_LEN * 0.55, -BODY_H * 0.62, BODY_LEN * 0.62, -BODY_H * 0.15);
     ctx.stroke();
-    var lureGlow = ctx.createRadialGradient(BODY_LEN * 0.62, -34, 0, BODY_LEN * 0.62, -34, 26);
+    var lureGlow = ctx.createRadialGradient(BODY_LEN * 0.62, -BODY_H * 0.15, 0, BODY_LEN * 0.62, -BODY_H * 0.15, BODY_LEN * 0.17);
     lureGlow.addColorStop(0, 'rgba(255, 224, 138, 0.95)');
     lureGlow.addColorStop(1, 'rgba(255, 190, 80, 0)');
     ctx.fillStyle = lureGlow;
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.62, -34, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.62, -BODY_H * 0.15, BODY_LEN * 0.17, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ffe9ad';
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.62, -34, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.62, -BODY_H * 0.15, BODY_LEN * 0.032, 0, Math.PI * 2); ctx.fill();
 
     // Eyes — pale, lidless, fixed forward.
     var pulse = 0.8 + Math.sin(time * 2.2 + w.lurePhase) * 0.2;
     ctx.fillStyle = 'rgba(191, 246, 255, ' + pulse + ')';
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.3, -BODY_H * 0.2, 6, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.2, -BODY_H * 0.3, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.3, -BODY_H * 0.2, BODY_LEN * 0.04, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.2, -BODY_H * 0.3, BODY_LEN * 0.03, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#06121f';
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.3, -BODY_H * 0.2, 2.4, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(BODY_LEN * 0.2, -BODY_H * 0.3, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.3, -BODY_H * 0.2, BODY_LEN * 0.016, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(BODY_LEN * 0.2, -BODY_H * 0.3, BODY_LEN * 0.012, 0, Math.PI * 2); ctx.fill();
 
     ctx.restore();
   }

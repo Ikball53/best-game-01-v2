@@ -106,6 +106,65 @@
     }
   }
 
+  // Small fish schools — dim silhouettes that show up in the beam.
+  function drawFish(ctx, world, cam, time) {
+    var schools = world.fish;
+    ctx.save();
+    for (var s = 0; s < schools.length; s++) {
+      var sc = schools[s];
+      var cx = sc.x + Math.sin(time * sc.speed + sc.phase) * sc.range;
+      var cy = sc.y + Math.cos(time * sc.speed * 0.7 + sc.phase) * sc.range * 0.5;
+      for (var i = 0; i < sc.members.length; i++) {
+        var m = sc.members[i];
+        var mx = cx + m.dx + Math.sin(time * 2 + m.ph) * 4;
+        var my = cy + m.dy + Math.cos(time * 1.7 + m.ph) * 3;
+        var sx = mx - cam.x, sy = my - cam.y;
+        if (sx < -40 || sx > VIEW_W + 40 || sy < -40 || sy > VIEW_H + 40) continue;
+        var len = 20 * m.s;
+        ctx.fillStyle = 'rgba(140, 190, 215, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(sx, sy, len * 0.5, len * 0.18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Tail.
+        ctx.beginPath();
+        ctx.moveTo(sx - sc.dir * len * 0.45, sy);
+        ctx.lineTo(sx - sc.dir * len * 0.75, sy - len * 0.16);
+        ctx.lineTo(sx - sc.dir * len * 0.75, sy + len * 0.16);
+        ctx.closePath(); ctx.fill();
+        // Eye dot.
+        ctx.fillStyle = 'rgba(220, 245, 255, 0.7)';
+        ctx.beginPath(); ctx.arc(sx + sc.dir * len * 0.28, sy - len * 0.04, 1.4, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  // Corals on the trench floor — branching shapes, dim teal/violet.
+  function drawCorals(ctx, world, cam) {
+    var corals = world.corals;
+    for (var i = 0; i < corals.length; i++) {
+      var c = corals[i];
+      var sx = c.x - cam.x;
+      var sy = c.y - cam.y;
+      if (sx < -60 || sx > VIEW_W + 60 || sy < -80 || sy > VIEW_H + 40) continue;
+      ctx.strokeStyle = c.hue === 'violet' ? 'rgba(178, 132, 220, 0.55)' : 'rgba(110, 220, 200, 0.5)';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      for (var b = 0; b < c.branches; b++) {
+        var spread = (b - (c.branches - 1) / 2) * 0.45;
+        var bx = sx + Math.sin(spread) * c.h * 0.7;
+        var by = sy - Math.cos(spread) * c.h;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.quadraticCurveTo(sx + spread * c.h * 0.4, sy - c.h * 0.55, bx, by);
+        ctx.stroke();
+        // Tip dot.
+        ctx.fillStyle = c.hue === 'violet' ? 'rgba(200, 160, 240, 0.7)' : 'rgba(140, 240, 215, 0.7)';
+        ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
   function drawSnow(ctx, world, cam, time) {
     ctx.fillStyle = 'rgba(200, 230, 245, 0.5)';
     var flakes = world.snow;
@@ -403,6 +462,45 @@
     ctx.restore();
   }
 
+  // Glowing jellyfish — soft bells that burn gently through the dark.
+  function drawJellyfish(ctx, world, cam, time) {
+    var jellies = world.jellyfish;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < jellies.length; i++) {
+      var j = jellies[i];
+      var sx = j.x - cam.x + Math.sin(time * 0.3 + j.phase) * j.drift;
+      var sy = j.y - cam.y + Math.sin(time * 0.45 + j.phase * 2) * 14;
+      if (sx < -90 || sx > VIEW_W + 90 || sy < -90 || sy > VIEW_H + 90) continue;
+      var pulse = 0.75 + 0.25 * Math.sin(time * 1.4 + j.phase);
+      var r = j.r * pulse;
+      var col = j.hue === 'pink' ? '255,150,200' : (j.hue === 'violet' ? '190,150,255' : '120,225,255');
+      var g = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3);
+      g.addColorStop(0, 'rgba(' + col + ',0.28)');
+      g.addColorStop(1, 'rgba(' + col + ',0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(sx, sy, r * 3, 0, Math.PI * 2); ctx.fill();
+      // Bell.
+      ctx.fillStyle = 'rgba(' + col + ',0.5)';
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, Math.PI, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.beginPath(); ctx.arc(sx - r * 0.3, sy - r * 0.35, r * 0.25, 0, Math.PI * 2); ctx.fill();
+      // Tentacles.
+      ctx.strokeStyle = 'rgba(' + col + ',0.4)';
+      ctx.lineWidth = 1.5;
+      for (var t = -1; t <= 1; t++) {
+        var sway = Math.sin(time * 1.8 + j.phase + t) * 6;
+        ctx.beginPath();
+        ctx.moveTo(sx + t * r * 0.45, sy + r * 0.4);
+        ctx.quadraticCurveTo(sx + t * r * 0.45 + sway, sy + r * 1.2, sx + t * r * 0.5 + sway * 1.4, sy + r * 1.9);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function drawSonarRingsTop(ctx, pings, cam) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
@@ -432,6 +530,8 @@
     var cam = s.cam;
     drawWater(ctx, s.world, cam, time);
     drawRocks(ctx, s.world, cam);
+    drawCorals(ctx, s.world, cam);
+    drawFish(ctx, s.world, cam, time);
     drawSnow(ctx, s.world, cam, time);
     drawPlankton(ctx, s.world, cam, time);
     drawTanks(ctx, s.world, cam, time);
@@ -445,6 +545,8 @@
     if (s.wardenReveal > 0.02) {
       global.TrenchWarden.drawWarden(ctx, s.warden, cam, time, s.wardenReveal);
     }
+    // Jellyfish glow through the dark, above the Warden, under the beam.
+    drawJellyfish(ctx, s.world, cam, time);
     drawBeamWash(ctx, s.diver, cam);
     // Eyes and lure burn through the dark before the body ever shows.
     global.TrenchWarden.drawWardenEyes(ctx, s.warden, cam, time);

@@ -118,6 +118,69 @@
     return motes;
   }
 
+  // Small fish: a few loose schools drifting through the dark.
+  function makeFish(rand) {
+    var schools = [];
+    var depths = [140, 260, 380, 470, 560, 650];
+    for (var s = 0; s < 6; s++) {
+      var members = [];
+      var n = 3 + Math.floor(rand() * 3);
+      for (var i = 0; i < n; i++) {
+        members.push({
+          dx: (rand() - 0.5) * 90,
+          dy: (rand() - 0.5) * 50,
+          s: 0.7 + rand() * 0.6,
+          ph: rand() * Math.PI * 2
+        });
+      }
+      schools.push({
+        x: 150 + rand() * (WORLD_W - 300),
+        y: (depths[s] + rand() * 30 - 15) * 10,
+        dir: rand() < 0.5 ? -1 : 1,
+        speed: 0.1 + rand() * 0.15,
+        range: 60 + rand() * 90,
+        phase: rand() * Math.PI * 2,
+        members: members
+      });
+    }
+    return schools;
+  }
+
+  // Glowing jellyfish: slow bells drifting in the dark, softly lit.
+  function makeJellyfish(rand) {
+    var jellies = [];
+    var hues = ['pink', 'cyan', 'violet', 'cyan'];
+    for (var i = 0; i < 4; i++) {
+      var depthM = 150 + rand() * 520;
+      jellies.push({
+        x: 150 + rand() * (WORLD_W - 300),
+        y: depthM * 10,
+        r: 14 + rand() * 12,
+        hue: hues[i],
+        phase: rand() * Math.PI * 2,
+        drift: 8 + rand() * 14
+      });
+    }
+    // One fixed near the menu's deep-water backdrop, lure-side.
+    jellies.push({ x: 980, y: 5750, r: 20, hue: 'cyan', phase: 1.2, drift: 10 });
+    return jellies;
+  }
+
+  // Corals on the trench floor: a little life at the very bottom.
+  function makeCorals(rand) {
+    var corals = [];
+    for (var i = 0; i < 8; i++) {
+      corals.push({
+        x: 80 + rand() * (WORLD_W - 160),
+        y: WORLD_H - 24 - rand() * 26,
+        h: 22 + rand() * 30,
+        branches: 3 + Math.floor(rand() * 3),
+        hue: rand() < 0.5 ? 'violet' : 'teal'
+      });
+    }
+    return corals;
+  }
+
   function createWorld(seed) {
     var rand = mulberry32(seed || 20261116);
     return {
@@ -131,6 +194,9 @@
       tanks: makeTanks(rand),
       snow: makeSnow(rand),
       plankton: makePlankton(rand),
+      fish: makeFish(rand),
+      jellyfish: makeJellyfish(rand),
+      corals: makeCorals(rand),
       // The Warden's lair: a dark den near the bottom it returns to.
       wardenDen: { x: WORLD_W / 2, y: 6100 }
     };

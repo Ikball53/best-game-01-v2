@@ -379,12 +379,16 @@
         world.relics[2].x = 880; world.relics[2].y = 4080;
         world.relics[3].x = 400; world.relics[3].y = 4400;
         game.pings.push({ x: 620, y: 4200, r: 190, alpha: 0.8 });
-        warden.x = 1080;
-        warden.y = 4350;
+        warden.x = 980;
+        warden.y = 4300;
+        warden.angle = Math.PI; // facing left, toward the diver
         warden.alert = 62;
         warden.mode = 'hunt';
-        game.wardenReveal = 0.25;
+        game.wardenReveal = 1;
         game.danger = 0.35;
+        // A little life in frame: a jellyfish top-left, a school in the beam.
+        world.jellyfish[0].x = 420; world.jellyfish[0].y = 4060;
+        world.fish[0].x = 900; world.fish[0].y = 4400; world.fish[0].range = 40;
         game.cam.x = 0;
         game.cam.y = 3840;
         showOnly(null);
@@ -402,11 +406,15 @@
         world.relics[0].taken = true;
         world.relics[1].taken = true;
         world.relics[2].taken = true;
-        warden.x = 950;
-        warden.y = 5080;
+        warden.x = 1050;
+        warden.y = 5250;
+        warden.angle = Math.PI; // facing left, clear of the lose card
         warden.alert = 90;
         game.wardenReveal = 1;
         game.danger = 0.9;
+        // A little life in frame: a jellyfish top-left, a school in the beam.
+        world.jellyfish[1].x = 300; world.jellyfish[1].y = 4900;
+        world.fish[0].x = 720; world.fish[0].y = 5090; world.fish[0].range = 40;
         game.cam.x = 0;
         game.cam.y = 4760;
         updateHud();
@@ -422,6 +430,8 @@
         game.elapsed = 214;
         game.maxDepthM = 695;
         world.relics.forEach(function (r, i) { if (i < 5) r.taken = true; });
+        // A little life at the surface: a school in the sunlit water.
+        world.fish[1].x = 950; world.fish[1].y = 300; world.fish[1].range = 40;
         game.cam.x = 0;
         game.cam.y = 0;
         updateHud();
@@ -442,7 +452,7 @@
       } else if (game.state === 'menu') {
         // The Warden lurks in the lower-right dark, lure glowing, behind the menu.
         warden.x = 1000;
-        warden.y = 6180;
+        warden.y = 6120;
         warden.angle = Math.PI; // facing left, toward the diver
         updateCamera(dt);
       }
